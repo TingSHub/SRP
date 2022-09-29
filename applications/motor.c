@@ -14,7 +14,7 @@
 
 struct rt_device *motor_dev;
 
-int speed;
+int speed = 500;
 
 int motor_init(void)
 {

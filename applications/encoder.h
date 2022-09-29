@@ -11,4 +11,8 @@
 #define LEFT_ENCODER_NAME   "pulse3"
 #define RIGHT_ENCODER_NAME  "pulse4"
 
+int encoder_init(void);
+float get_motor_rotate_speed(void);
+
+
 #endif /* APPLICATIONS_ENCODER_H_ */

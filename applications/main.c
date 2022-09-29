@@ -19,6 +19,9 @@
 #include "board.h"
 #include "motor.h"
 #include "servo.h"
+#include "timer.h"
+#include "encoder.h"
+#include "pid.h"
 
 #define THREAD_PRIORITY         30
 #define THREAD_STACK_SIZE       512
@@ -33,9 +36,17 @@ int main(void)
 {
     if (motor_init()) {
         rt_kprintf("motor init error.\n");
-        return -1;
+        return -RT_ERROR;
     }
-    //servo_start();
+    if (encoder_init()) {
+        rt_kprintf("encoder init error.\n");
+        return -RT_ERROR;
+    }
+    Motor_PID_Init();
+    if (timer_init()) {
+        rt_kprintf("timer init error.\n");
+        return -RT_ERROR;
+    }
 
     return RT_EOK;
 }
