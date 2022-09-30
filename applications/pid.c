@@ -8,8 +8,10 @@
   */ 
 #include "pid.h"
 
-struct PID_constant constant_left, constant_right;
-struct PID left, right;
+struct PID_constant constant_left;
+struct PID_constant constant_right;
+struct PID left;
+struct PID right;
 
 void PID_Constant_Init(struct PID_constant *p_constant, 
 float set_time, float set_kp, float set_ki, float set_kd)
@@ -91,6 +93,6 @@ void Motor_PID_Init()
 {
 	PID_Constant_Init(&constant_left, 0.1, 3.5, 1.5, 0.08);
 	PID_Constant_Init(&constant_right, 0.1, 3.5, 1.5, 0.08);
-	PID_Init(&left, &constant_left, 200);
-	PID_Init(&right, &constant_right, 200);
+	PID_Init(&left, &constant_left, 0);
+	PID_Init(&right, &constant_right, 0);
 }

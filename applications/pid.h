@@ -19,8 +19,10 @@ struct PID_constant
 	float ki;				//ki
 	float kd;				//kd
 };
-struct PID_constant constant_left, constant_right;
-struct PID left, right;
+struct PID_constant constant_left;
+struct PID_constant constant_right;
+struct PID left;
+struct PID right;
 //PID固定参数初始化函数
 void PID_Constant_Init(struct PID_constant *p_constant, 
 float set_time, float set_kp, float set_ki, float set_kd);

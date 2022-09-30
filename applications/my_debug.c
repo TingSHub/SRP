@@ -4,14 +4,16 @@
  * SPDX-License-Identifier: Apache-2.0
  *
  * Change Logs:
- * Date           Author       Notes
+ * Date           Author                Notes
  * 2022-09-22     Administrator       the first version
  */
 #include <rtthread.h>
-#include "main.h"
 #include <stdlib.h>
+#include "encoder.h"
+#include "main.h"
+#include "timer.h"
+#include "pid.h"
 
-extern volatile int speed;
 extern volatile int angle;
 
 void clock_show(void)
@@ -24,14 +26,23 @@ void clock_show(void)
 }
 MSH_CMD_EXPORT(clock_show, show system clock.);
 
-void set_speed(int argc, char **argv)
+void set_left_speed(int argc, char **argv)
 {
     if (argc != 2) {
         rt_kprintf("arguments error.\n");
     }
-    speed = atoi(argv[1]);
+    PID_Change_Setpoint(&left, atoi(argv[1]));
 }
-MSH_CMD_EXPORT(set_speed, set motor speed control range from -1000 to 1000.);
+MSH_CMD_EXPORT(set_left_speed, set motor left speed control range from -1000 to 1000.);
+
+void set_right_speed(int argc, char **argv)
+{
+    if (argc != 2) {
+        rt_kprintf("arguments error.\n");
+    }
+    PID_Change_Setpoint(&right, atoi(argv[1]));
+}
+MSH_CMD_EXPORT(set_right_speed, set motor right speed control range from -1000 to 1000.);
 
 void set_angle(int argc, char **argv)
 {
@@ -41,3 +52,15 @@ void set_angle(int argc, char **argv)
     angle = atoi(argv[1]);
 }
 MSH_CMD_EXPORT(set_angle, set servo angle range from 0 to 120.);
+
+
+void get_speed(int argc, char *argv[])
+{
+    int i = 0;
+    for (;i < 10; i++) {
+        rt_kprintf("leftSpeed %d.\n", leftSpeed);
+        rt_kprintf("rightSpeed %d.\n\n", rightSpeed);
+        rt_thread_mdelay(2000);
+    }
+}
+MSH_CMD_EXPORT(get_speed, get speed);

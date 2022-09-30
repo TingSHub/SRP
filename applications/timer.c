@@ -12,18 +12,30 @@
 #include "timer.h"
 #include "pid.h"
 
+int leftSpeed;
+int rightSpeed;
+
 void motor_timeout(void* parameter)
 {
-    float rotate = get_motor_rotate_speed();
-    int speed = rotate;
-    PID_Input_Renew(&left, rotate);
+    float leftRotate = get_motor_rotate_speed(left_encoder);
+    float rightRotate = get_motor_rotate_speed(right_encoder);
+    leftSpeed = leftRotate;
+    rightSpeed = rightRotate;
+    int leftPreOutput = PID_Output(&left);
+    int rightPreOutput = PID_Output(&right);
+    PID_Input_Renew(&left, leftRotate);
     PID_Compute(&left);
-//    PID_Input_Renew(&right, rotate);
-//    PID_Compute(&right);
-    int ouput = PID_Output(&left);
-    rt_device_control(motor_dev, SET_MOTOR_SPEED_LEFT, (void*)(&ouput));
-//    rt_device_control(motor_dev, SET_MOTOR_SPEED_RIGHT, (void*)(&speed));
-    rt_kprintf("speed %d.\n", speed);
+    PID_Input_Renew(&right, rightRotate);
+    PID_Compute(&right);
+    int leftOuput = PID_Output(&left);
+    int rightOuput = PID_Output(&right);
+    //计算输出值不变不调用驱动程序
+    if (leftPreOutput != leftOuput) {
+        rt_device_control(motor_dev, SET_MOTOR_SPEED_LEFT, (void*)(&leftOuput));
+    }
+    if (rightPreOutput != rightOuput) {
+        rt_device_control(motor_dev, SET_MOTOR_SPEED_RIGHT, (void*)(&rightOuput));
+    }
 }
 
 int timer_init(void)

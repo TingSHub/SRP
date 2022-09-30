@@ -11,8 +11,11 @@
 #define LEFT_ENCODER_NAME   "pulse3"
 #define RIGHT_ENCODER_NAME  "pulse4"
 
+struct rt_device *left_encoder;
+struct rt_device *right_encoder;
+
 int encoder_init(void);
-float get_motor_rotate_speed(void);
+float get_motor_rotate_speed(struct rt_device *encoder);
 
 
 #endif /* APPLICATIONS_ENCODER_H_ */

@@ -9,6 +9,9 @@
 #define APPLICATIONS_TIMER_H_
 #define PID_TIMER_PERIOD 100
 
+int leftSpeed;
+int rightSpeed;
+
 int timer_init(void);
 
 #endif /* APPLICATIONS_TIMER_H_ */

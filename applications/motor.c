@@ -14,8 +14,6 @@
 
 struct rt_device *motor_dev;
 
-int speed = 500;
-
 int motor_init(void)
 {
     rt_err_t ret = -1;

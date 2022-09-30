@@ -28,7 +28,7 @@ int motor_init(void);
 
 struct rt_device *motor_dev;
 
-int speed;
+volatile int speed;
 
 #ifdef __cplusplus
 }

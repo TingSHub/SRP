@@ -40,49 +40,14 @@ int encoder_init(void)
     return RT_EOK;
 }
 
-float get_motor_rotate_speed(void)
+float get_motor_rotate_speed(struct rt_device *encoder)
 {
     rt_int32_t count;
     float rotateSpeed;
-    rt_device_read(left_encoder, 0, &count, 1);
+    rt_device_read(encoder, 0, &count, 1);
     /* 清空脉冲编码器计数值 */
-    rt_device_control(left_encoder, PULSE_ENCODER_CMD_CLEAR_COUNT, RT_NULL);
+    rt_device_control(encoder, PULSE_ENCODER_CMD_CLEAR_COUNT, RT_NULL);
     //转速 = 单位时间内的计数值 / 总分辨率 * 时间系数 单位 r / min
     rotateSpeed = 60 * count * (float)(1000 / PID_TIMER_PERIOD) / (float)TOTAL_RESOLUTION;
     return rotateSpeed;
 }
-
-static int pulse_encoder_sample(int argc, char *argv[])
-{
-    rt_err_t ret = RT_EOK;
-    rt_uint32_t index;
-    rt_int32_t count;
-
-    /* 查找脉冲编码器设备 */
-    left_encoder = rt_device_find(LEFT_ENCODER_NAME);
-    if (left_encoder == RT_NULL) {
-        rt_kprintf("pulse encoder sample run failed! can't find %s device!\n", LEFT_ENCODER_NAME);
-        return RT_ERROR;
-    }
-
-    /* 以只读方式打开设备 */
-    ret = rt_device_open(left_encoder, RT_DEVICE_OFLAG_RDONLY);
-    if (ret != RT_EOK) {
-        rt_kprintf("open %s device failed!\n", LEFT_ENCODER_NAME);
-        return ret;
-    }
-
-    for (index = 0; index <= 10; index ++) {
-        rt_thread_mdelay(100);
-        /* 读取脉冲编码器计数值 */
-        rt_device_read(left_encoder, 0, &count, 1);
-        /* 清空脉冲编码器计数值 */
-        rt_device_control(left_encoder, PULSE_ENCODER_CMD_CLEAR_COUNT, RT_NULL);
-        rt_kprintf("get count %d\n",count);
-    }
-
-    rt_device_close(left_encoder);
-    return ret;
-}
-/* 导出到 msh 命令列表中 */
-MSH_CMD_EXPORT(pulse_encoder_sample, pulse encoder sample);
