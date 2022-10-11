@@ -9,8 +9,8 @@
 #define APPLICATIONS_TIMER_H_
 #define PID_TIMER_PERIOD 100
 
-int leftSpeed;
-int rightSpeed;
+volatile int leftSpeed;
+volatile int rightSpeed;
 
 int timer_init(void);
 

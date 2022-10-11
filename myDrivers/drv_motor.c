@@ -16,39 +16,33 @@
 #define IN3 83
 #define IN4 84
 #define MOTOR_PWM_DEV           "pwm2"
-#define MOTOR_NAME              "motor"
+#define MOTOR_LEFT_NAME         "motor-left"
+#define MOTOR_RIGHT_NAME        "motor-right"
 #define MOTOR_LEFT_PWM_CHANNEL  2
 #define MOTOR_RIGHT_PWM_CHANNEL 3
 #define MOTOR_PERIOD_PWM        1000000
 
-#define SET_MOTOR_SPEED_LEFT        0x21   /* 速度设置，参数：占空比 */
-#define SET_MOTOR_SPEED_RIGHT       0x22   /* 速度设置，参数：占空比 */
-
-struct motor_pwm_drv {
-    struct rt_device_pwm* pwm_device;
-    rt_uint32_t period;
-    char channel_left;
-    char channel_right;
-    char *name;
-};
+#define SET_MOTOR_SPEED        0x21   /* 速度设置，参数：占空比 */
 
 struct motor_dev
 {
     struct rt_device parent;
-    struct motor_pwm_drv motor_pwm_drv;
-    unsigned char left_pin1;
-    unsigned char left_pin2;
-    unsigned char right_pin1;
-    unsigned char right_pin2;
+    struct rt_device_pwm* pwm_device;
+    rt_uint32_t period;
+    char channel;
+    unsigned char pin1;
+    unsigned char pin2;
     char *name;
-} __motor_dev;
+    char *pwm_name;
+} __motor_dev_left, __motor_dev_right;
 
 static rt_err_t drv_motor_init(rt_device_t dev);
 static rt_err_t drv_motor_control(rt_device_t dev, int cmd, void *arg);
 static rt_err_t drv_motor_open(rt_device_t dev, rt_uint16_t oflag);
 static rt_err_t drv_motor_close(rt_device_t dev);
 
-static struct motor_dev *motor_dev = &__motor_dev;
+static struct motor_dev *motor_left = &__motor_dev_left;
+static struct motor_dev *motor_right = &__motor_dev_right;
 
 static struct rt_device_ops motor_drv_ops =
 {
@@ -62,74 +56,46 @@ static struct rt_device_ops motor_drv_ops =
 
 static inline void set_forward(struct motor_dev *parent)
 {
-    rt_pin_write(parent->left_pin1, PIN_HIGH);
-    rt_pin_write(parent->left_pin2, PIN_LOW);
-    rt_pin_write(parent->right_pin1, PIN_HIGH);
-    rt_pin_write(parent->right_pin2, PIN_LOW);
+    rt_pin_write(parent->pin1, PIN_HIGH);
+    rt_pin_write(parent->pin2, PIN_LOW);
 }
 
 static inline void set_backward(struct motor_dev *parent)
 {
-    rt_pin_write(parent->left_pin1, PIN_LOW);
-    rt_pin_write(parent->left_pin2, PIN_HIGH);
-    rt_pin_write(parent->right_pin1, PIN_LOW);
-    rt_pin_write(parent->right_pin2, PIN_HIGH);
+    rt_pin_write(parent->pin1, PIN_LOW);
+    rt_pin_write(parent->pin2, PIN_HIGH);
 }
 
 static inline void set_stop(struct motor_dev *parent)
 {
-    rt_pin_write(parent->left_pin1, PIN_LOW);
-    rt_pin_write(parent->left_pin2, PIN_LOW);
-    rt_pin_write(parent->right_pin1, PIN_LOW);
-    rt_pin_write(parent->right_pin2, PIN_LOW);
+    rt_pin_write(parent->pin1, PIN_LOW);
+    rt_pin_write(parent->pin2, PIN_LOW);
 }
 
-static inline void set_pwm_left(struct motor_dev *motor_dev, int duty)
+static inline void set_pwm(struct motor_dev *motor_dev, int duty)
 {
-    rt_uint32_t pulse = motor_dev->motor_pwm_drv.period / 1000 * duty;
-    rt_pwm_set(motor_dev->motor_pwm_drv.pwm_device, motor_dev->motor_pwm_drv.channel_left, motor_dev->motor_pwm_drv.period, pulse);
+    rt_uint32_t pulse = motor_dev->period / 1000 * duty;
+    rt_pwm_set(motor_dev->pwm_device, motor_dev->channel, motor_dev->period, pulse);
 }
 
-static inline void set_pwm_right(struct motor_dev *motor_dev, int duty)
-{
-    rt_uint32_t pulse = motor_dev->motor_pwm_drv.period / 1000 * duty;
-    rt_pwm_set(motor_dev->motor_pwm_drv.pwm_device, motor_dev->motor_pwm_drv.channel_right, motor_dev->motor_pwm_drv.period, pulse);
-}
-
-static void set_motor_left_rotate(struct motor_dev *motor_dev, int duty)
+static void set_motor_rotate(struct motor_dev *motor_dev, int duty)
 {
     if(duty > 0) {
-        set_pwm_left(motor_dev, duty);
+        set_pwm(motor_dev, duty);
         set_forward(motor_dev);
     } else if(duty < 0) {
-        set_pwm_left(motor_dev, -duty);
+        set_pwm(motor_dev, -duty);
         set_backward(motor_dev);
     } else {
-        set_pwm_left(motor_dev, 0);
-        set_stop(motor_dev);
-    }
-}
-
-static void set_motor_right_rotate(struct motor_dev *motor_dev, int duty)
-{
-    if(duty > 0) {
-        set_pwm_right(motor_dev, duty);
-        set_forward(motor_dev);
-    } else if(duty < 0) {
-        set_pwm_right(motor_dev, -duty);
-        set_backward(motor_dev);
-    } else {
-        set_pwm_right(motor_dev, 0);
+        set_pwm(motor_dev, 0);
         set_stop(motor_dev);
     }
 }
 
 static void motor_pin_init(struct motor_dev *motor_dev)
 {
-    rt_pin_mode(motor_dev->left_pin1, PIN_MODE_OUTPUT);
-    rt_pin_mode(motor_dev->left_pin2, PIN_MODE_OUTPUT);
-    rt_pin_mode(motor_dev->right_pin1, PIN_MODE_OUTPUT);
-    rt_pin_mode(motor_dev->right_pin2, PIN_MODE_OUTPUT);
+    rt_pin_mode(motor_dev->pin1, PIN_MODE_OUTPUT);
+    rt_pin_mode(motor_dev->pin2, PIN_MODE_OUTPUT);
     set_stop(motor_dev);
 }
 
@@ -143,13 +109,9 @@ static rt_err_t drv_motor_control(rt_device_t dev, int cmd, void *arg)
         duty = 1000;
     } else {}
     switch (cmd) {
-    case SET_MOTOR_SPEED_LEFT:
+    case SET_MOTOR_SPEED:
         //rt_kprintf("left:%d.\n", duty);
-        set_motor_left_rotate(motor_dev, duty);
-        break;
-    case SET_MOTOR_SPEED_RIGHT:
-        //rt_kprintf("right:%d.\n", duty);
-        set_motor_right_rotate(motor_dev, duty);
+        set_motor_rotate(motor_dev, duty);
         break;
     default:
         break;
@@ -159,63 +121,73 @@ static rt_err_t drv_motor_control(rt_device_t dev, int cmd, void *arg)
 static rt_err_t drv_motor_open(rt_device_t dev, rt_uint16_t oflag)
 {
     struct motor_dev *motor_dev = rt_container_of(dev, struct motor_dev, parent);
-    rt_pwm_enable(motor_dev->motor_pwm_drv.pwm_device, motor_dev->motor_pwm_drv.channel_left);
-    rt_pwm_enable(motor_dev->motor_pwm_drv.pwm_device, motor_dev->motor_pwm_drv.channel_right);
+    rt_pwm_enable(motor_dev->pwm_device, motor_dev->channel);
     return RT_EOK;
 }
 
 static rt_err_t drv_motor_close(rt_device_t dev)
 {
     struct motor_dev *motor_dev = rt_container_of(dev, struct motor_dev, parent);
-    rt_pwm_disable(motor_dev->motor_pwm_drv.pwm_device, motor_dev->motor_pwm_drv.channel_left);
-    rt_pwm_disable(motor_dev->motor_pwm_drv.pwm_device, motor_dev->motor_pwm_drv.channel_right);
+    rt_pwm_disable(motor_dev->pwm_device, motor_dev->channel);
     return RT_EOK;
 }
 
 static rt_err_t drv_motor_init(rt_device_t dev)
 {
     struct motor_dev *motor_dev = rt_container_of(dev, struct motor_dev, parent);
-    motor_dev->motor_pwm_drv.name = MOTOR_PWM_DEV;
-    motor_dev->motor_pwm_drv.pwm_device =  (struct rt_device_pwm*)rt_device_find(MOTOR_PWM_DEV);
-    if (motor_dev->motor_pwm_drv.pwm_device == RT_NULL) {
-        rt_kprintf("find %s error.\n", motor_dev->motor_pwm_drv.name);
+    motor_dev->pwm_name = MOTOR_PWM_DEV;
+    motor_dev->pwm_device =  (struct rt_device_pwm*)rt_device_find(MOTOR_PWM_DEV);
+    if (motor_dev->pwm_device == RT_NULL) {
+        rt_kprintf("find %s error.\n", motor_dev->pwm_name);
         return -1;
     }
-    motor_dev->motor_pwm_drv.period = MOTOR_PERIOD_PWM;
-    motor_dev->motor_pwm_drv.channel_left = MOTOR_LEFT_PWM_CHANNEL;
-    motor_dev->motor_pwm_drv.channel_right = MOTOR_RIGHT_PWM_CHANNEL;
-    motor_dev->left_pin1 = IN1;
-    motor_dev->left_pin2 = IN2;
-    motor_dev->right_pin1 = IN3;
-    motor_dev->right_pin1 = IN4;
-
     motor_pin_init(motor_dev);
-    set_motor_left_rotate(motor_dev, 0);
-    set_motor_left_rotate(motor_dev, 0);
+    set_motor_rotate(motor_dev, 0);
     return RT_EOK;
 }
 
 int init_motor(void)
 {
     int ret = -1;
-    motor_dev->name = MOTOR_NAME;
-    memset(&motor_dev->parent, 0, sizeof(struct rt_device));
-
+    motor_left->name = MOTOR_LEFT_NAME;
+    motor_right->name = MOTOR_RIGHT_NAME;
+    memset(&motor_left->parent, 0, sizeof(struct rt_device));
+    memset(&motor_right->parent, 0, sizeof(struct rt_device));
 #ifdef RT_USING_DEVICE_OPS
-    motor_dev->parent.ops = &motor_drv_ops;
+    motor_left->parent.ops = &motor_drv_ops;
+    motor_right->parent.ops = &motor_drv_ops;
 #else
-    motor_dev->parent.init = drv_motor_init;
-    motor_dev->parent.open = drv_motor_open;
-    motor_dev->parent.close = drv_motor_close;
-    motor_dev->parent.control = drv_motor_control;
-    motor_dev->parent.read  = RT_NULL;
-    motor_dev->parent.write = RT_NULL;
+    motor_left->parent.init = drv_motor_init;
+    motor_left->parent.open = drv_motor_open;
+    motor_left->parent.close = drv_motor_close;
+    motor_left->parent.control = drv_motor_control;
+    motor_left->parent.read  = RT_NULL;
+    motor_left->parent.write = RT_NULL;
+    motor_right->parent.init = drv_motor_init;
+    motor_right->parent.open = drv_motor_open;
+    motor_right->parent.close = drv_motor_close;
+    motor_right->parent.control = drv_motor_control;
+    motor_right->parent.read  = RT_NULL;
+    motor_right->parent.write = RT_NULL;
 #endif /* RT_USING_DEVICE_OPS */
 
-    motor_dev->parent.type = RT_Device_Class_Miscellaneous;
+    motor_left->parent.type = RT_Device_Class_Miscellaneous;
+    motor_right->parent.type = RT_Device_Class_Miscellaneous;
     //设备注册
-    ret = rt_device_register(&motor_dev->parent, motor_dev->name, RT_DEVICE_FLAG_RDWR);
+    ret = rt_device_register(&motor_left->parent, motor_left->name, RT_DEVICE_FLAG_RDWR);
+    ret = rt_device_register(&motor_right->parent, motor_right->name, RT_DEVICE_FLAG_RDWR);
     RT_ASSERT(ret == RT_EOK);
+
+    motor_left->period = MOTOR_PERIOD_PWM;
+    motor_left->channel = MOTOR_LEFT_PWM_CHANNEL;
+    motor_left->pin1 = IN1;
+    motor_left->pin2 = IN2;
+
+    motor_right->period = MOTOR_PERIOD_PWM;
+    motor_right->channel = MOTOR_RIGHT_PWM_CHANNEL;
+    motor_right->pin1 = IN3;
+    motor_right->pin2 = IN4;
+
     return RT_EOK;
 }
 INIT_BOARD_EXPORT(init_motor);

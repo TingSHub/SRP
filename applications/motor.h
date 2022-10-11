@@ -17,16 +17,17 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#define MOTOR_DEV "motor"
+#define MOTOR_LEFT  "motor-left"
+#define MOTOR_RIGHT "motor-right"
 #define ENCODER1_NAME "pulse3"
 #define ENCODER2_NAME "pulse4"
 
-#define SET_MOTOR_SPEED_LEFT        0x21   /* 速度设置，参数：占空比 */
-#define SET_MOTOR_SPEED_RIGHT       0x22   /* 速度设置，参数：占空比 */
+#define SET_MOTOR_SPEED        0x21   /* 速度设置，参数：占空比 */
 
 int motor_init(void);
 
-struct rt_device *motor_dev;
+struct rt_device *motor_left;
+struct rt_device *motor_right;
 
 volatile int speed;
 

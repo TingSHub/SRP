@@ -57,7 +57,7 @@ MSH_CMD_EXPORT(set_angle, set servo angle range from 0 to 120.);
 void get_speed(int argc, char *argv[])
 {
     int i = 0;
-    for (;i < 10; i++) {
+    for (;i < 5; i++) {
         rt_kprintf("leftSpeed %d.\n", leftSpeed);
         rt_kprintf("rightSpeed %d.\n\n", rightSpeed);
         rt_thread_mdelay(2000);

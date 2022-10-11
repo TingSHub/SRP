@@ -22,6 +22,7 @@
 #include "timer.h"
 #include "encoder.h"
 #include "pid.h"
+#include "buletooth.h"
 
 #define THREAD_PRIORITY         30
 #define THREAD_STACK_SIZE       512
@@ -45,6 +46,10 @@ int main(void)
     Motor_PID_Init();
     if (timer_init()) {
         rt_kprintf("timer init error.\n");
+        return -RT_ERROR;
+    }
+    if (buletooth_init()) {
+        rt_kprintf("buletooth init error.\n");
         return -RT_ERROR;
     }
 

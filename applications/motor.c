@@ -12,19 +12,30 @@
 #include <rtthread.h>
 #include "motor.h"
 
-struct rt_device *motor_dev;
+struct rt_device *motor_left;
+struct rt_device *motor_right;
 
 int motor_init(void)
 {
     rt_err_t ret = -1;
-    motor_dev = (struct rt_device*)rt_device_find(MOTOR_DEV);
-    if (motor_dev == RT_NULL) {
-        rt_kprintf("find %s error.\n", motor_dev);
+    motor_left = (struct rt_device*)rt_device_find(MOTOR_LEFT);
+    if (motor_left == RT_NULL) {
+        rt_kprintf("find %s error.\n", motor_left);
         return -RT_ERROR;
     }
-    ret = rt_device_open(motor_dev, RT_DEVICE_OFLAG_RDWR);
+    motor_right = (struct rt_device*)rt_device_find(MOTOR_RIGHT);
+    if (motor_right == RT_NULL) {
+        rt_kprintf("find %s error.\n", motor_right);
+        return -RT_ERROR;
+    }
+    ret = rt_device_open(motor_left, RT_DEVICE_OFLAG_RDWR);
     if (ret != RT_EOK) {
-        rt_kprintf("open %s error.\n", motor_dev);
+        rt_kprintf("open %s error.\n", motor_left);
+        return ret;
+    }
+    ret = rt_device_open(motor_right, RT_DEVICE_OFLAG_RDWR);
+    if (ret != RT_EOK) {
+        rt_kprintf("open %s error.\n", motor_right);
         return ret;
     }
     return RT_EOK;
