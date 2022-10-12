@@ -23,12 +23,12 @@ void motor_timeout(void* parameter)
     leftSpeed = leftRotate;
     rightSpeed = rightRotate;
     //更新反馈速度 PID计算
-    //rt_mutex_take(pid_mutex, RT_WAITING_FOREVER); //获取互斥量 防止设定值在pid计算时发生改变
+    rt_mutex_take(pid_mutex, RT_WAITING_FOREVER); //获取互斥量 防止设定值在pid计算时发生改变
     PID_Input_Renew(&left, leftRotate);
     PID_Compute(&left);
     PID_Input_Renew(&right, rightRotate);
     PID_Compute(&right);
-    //rt_mutex_release(pid_mutex);  //释放互斥量
+    rt_mutex_release(pid_mutex);  //释放互斥量
     int leftOuput = PID_Output(&left);
     int rightOuput = PID_Output(&right);
     //计算输出值不变不调用驱动程序
@@ -45,7 +45,7 @@ int timer_init(void)
     }
     //创建硬件定时器 周期计时 OSTick = 100hz 100ms计算一次
     rt_timer_t motor_timer = rt_timer_create("motor timer", motor_timeout, NULL,
-            PID_TIMER_PERIOD, RT_TIMER_FLAG_PERIODIC | RT_TIMER_FLAG_HARD_TIMER);
+            PID_TIMER_PERIOD, RT_TIMER_FLAG_PERIODIC | RT_TIMER_FLAG_SOFT_TIMER);
     if (motor_timer == RT_NULL) {
        rt_kprintf("motor timer error.\n");
        return -RT_ERROR;

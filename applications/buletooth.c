@@ -26,12 +26,15 @@ static void RemoteControl(uint8_t ch)
     switch (ch) {
     case 'A':
         angle = 60;
+        rt_device_control(servo_dev, SET_SERVO_ANGLE, (void*)(&(angle)));
         break;
     case 'B':
         angle = 90;
+        rt_device_control(servo_dev, SET_SERVO_ANGLE, (void*)(&(angle)));
         break;
     case 'C':
         angle = 120;
+        rt_device_control(servo_dev, SET_SERVO_ANGLE, (void*)(&(angle)));
         break;
     case 'D':
 
@@ -44,9 +47,11 @@ static void RemoteControl(uint8_t ch)
         break;
     case 'G':
         angle = 30;
+        rt_device_control(servo_dev, SET_SERVO_ANGLE, (void*)(&(angle)));
         break;
     case 'H':
         angle = 40;
+        rt_device_control(servo_dev, SET_SERVO_ANGLE, (void*)(&(angle)));
         break;
     case 'X':
         PID_Change_Setpoint(&left, left.setpoint + 50);
@@ -63,7 +68,6 @@ static void RemoteControl(uint8_t ch)
     default:
         break;
     }
-    rt_device_control(servo_dev, SET_SERVO_ANGLE, (void*)(&(angle)));
 }
 
 
