@@ -12,7 +12,7 @@
 #define SET_SERVO_ANGLE 0x20 //舵机角度设置cmd
 
 struct rt_device* servo_dev;
-int angle;
+volatile int angle;
 
 int servo_init(void);
 

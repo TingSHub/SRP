@@ -12,7 +12,7 @@
 #include "servo.h"
 
 struct rt_device* servo_dev;
-int angle;
+volatile int angle;
 
 int servo_init(void)
 {

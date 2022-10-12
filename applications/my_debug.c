@@ -13,8 +13,7 @@
 #include "main.h"
 #include "timer.h"
 #include "pid.h"
-
-extern volatile int angle;
+#include "servo.h"
 
 void clock_show(void)
 {
@@ -50,6 +49,7 @@ void set_angle(int argc, char **argv)
         rt_kprintf("arguments error.\n");
     }
     angle = atoi(argv[1]);
+    rt_device_control(servo_dev, SET_SERVO_ANGLE, (void*)(&(angle)));
 }
 MSH_CMD_EXPORT(set_angle, set servo angle range from 0 to 120.);
 

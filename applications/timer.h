@@ -11,6 +11,7 @@
 
 volatile int leftSpeed;
 volatile int rightSpeed;
+rt_mutex_t pid_mutex;
 
 int timer_init(void);
 

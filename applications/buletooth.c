@@ -6,6 +6,9 @@
  * 2022-10-11     Huang Ting      the first version
  */
 #include "buletooth.h"
+#include "pid.h"
+#include "timer.h"
+#include "servo.h"
 struct rt_device *buletooth;                //串口设备句柄
 struct rt_semaphore buletooth_rx_sem;       //用于接收消息的信号量
 
@@ -18,17 +21,68 @@ static rt_err_t buletooth_input(rt_device_t dev, rt_size_t size)
     return RT_EOK;
 }
 
+static void RemoteControl(uint8_t ch)
+{
+    switch (ch) {
+    case 'A':
+        angle = 60;
+        break;
+    case 'B':
+        angle = 90;
+        break;
+    case 'C':
+        angle = 120;
+        break;
+    case 'D':
+
+        break;
+    case 'E':
+
+        break;
+    case 'F':
+
+        break;
+    case 'G':
+        angle = 30;
+        break;
+    case 'H':
+        angle = 40;
+        break;
+    case 'X':
+        PID_Change_Setpoint(&left, left.setpoint + 50);
+        PID_Change_Setpoint(&right, right.setpoint + 50);
+        break;
+    case 'Y':
+        PID_Change_Setpoint(&left, left.setpoint - 50);
+        PID_Change_Setpoint(&right, right.setpoint - 50);
+        break;
+    case 'Z':
+        PID_Change_Setpoint(&left, 0);
+        PID_Change_Setpoint(&right, 0);
+        break;
+    default:
+        break;
+    }
+    rt_device_control(servo_dev, SET_SERVO_ANGLE, (void*)(&(angle)));
+}
+
+
 static void serial_thread_entry(void *parameter)
 {
-    char ch;
+    static char ch = '\0';
     while (1) {
+        char tmp = ch;
         /* 从串口读取一个字节的数据 没有读取到则等待接收信号量 */
         while (rt_device_read(buletooth, -1, &ch, 1) != 1) {
             /* 阻塞等待接收信号量 等到信号量后再次读取数据 */
             rt_sem_take(&buletooth_rx_sem, RT_WAITING_FOREVER);
         }
-        /* 读取到的数据输出 */
-        rt_kprintf("%c\n", ch);
+        if (tmp != ch || ch == 'X' || ch == 'Y') {
+            rt_mutex_take(pid_mutex, RT_WAITING_FOREVER);
+            RemoteControl(ch); //根据蓝牙发送字符进行动作
+            rt_mutex_release(pid_mutex);
+            rt_kprintf("%c\n", ch);
+        }
     }
 }
 
