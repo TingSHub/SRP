@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "i2c.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
@@ -62,7 +63,7 @@ void SystemClock_Config(void);
   * @brief  The application entry point.
   * @retval int
   */
-__weak int main(void)
+__WEAK int main(void)
 {
   /* USER CODE BEGIN 1 */
 
@@ -90,6 +91,8 @@ __weak int main(void)
   MX_TIM3_Init();
   MX_TIM4_Init();
   MX_TIM2_Init();
+  MX_I2C1_Init();
+  MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
