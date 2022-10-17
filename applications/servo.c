@@ -1,9 +1,6 @@
 /*
- * Copyright (c) 2006-2021, RT-Thread Development Team
+ * Copyright (c) 2006-2021, https://github.com/TingSHub
  *
- * SPDX-License-Identifier: Apache-2.0
- *
- * Change Logs:
  * Date           Author       Notes
  * 2022-09-22     Administrator       the first version
  */
