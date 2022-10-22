@@ -23,6 +23,7 @@
 #include "encoder.h"
 #include "pid.h"
 #include "buletooth.h"
+#include "oled.h"
 
 int main(void)
 {
@@ -39,6 +40,7 @@ int main(void)
         return -RT_ERROR;
     }
     Motor_PID_Init();
+    oled_init();
     if (timer_init()) {
         rt_kprintf("timer init error.\n");
         return -RT_ERROR;

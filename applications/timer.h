@@ -8,6 +8,7 @@
 #ifndef APPLICATIONS_TIMER_H_
 #define APPLICATIONS_TIMER_H_
 #define PID_TIMER_PERIOD 100
+#define OLED_TIMER_PERIOD 1000
 
 volatile int leftSpeed;
 volatile int rightSpeed;

@@ -11,6 +11,7 @@
 #include "encoder.h"
 #include "timer.h"
 #include "pid.h"
+#include "oled.h"
 
 volatile int leftSpeed;
 volatile int rightSpeed;
@@ -36,6 +37,14 @@ void motor_timeout(void* parameter)
     rt_device_control(motor_right, SET_MOTOR_SPEED, (void*)(&rightOuput));
 }
 
+void oled_timeout(void* parameter)
+{
+    u8g2_ClearBuffer(&u8g2);
+    u8g2_SetFont(&u8g2, u8g2_font_ncenB08_tr);
+    u8g2_DrawStr(&u8g2, 1, 18, "Setpoint:");
+    u8g2_SendBuffer(&u8g2);
+}
+
 int timer_init(void)
 {
     rt_err_t ret;
@@ -53,6 +62,17 @@ int timer_init(void)
     ret = rt_timer_start(motor_timer);
     if (ret != RT_EOK) {
        rt_kprintf("motor timer start error.\n");
+       return ret;
+    }
+    rt_timer_t oled_timer = rt_timer_create("oled timer", oled_timeout, NULL,
+            OLED_TIMER_PERIOD, RT_TIMER_FLAG_PERIODIC | RT_TIMER_FLAG_SOFT_TIMER);
+    if (oled_timer == RT_NULL) {
+       rt_kprintf("oled timer error.\n");
+       return -RT_ERROR;
+    }
+    ret = rt_timer_start(oled_timer);
+    if (ret != RT_EOK) {
+       rt_kprintf("oled timer start error.\n");
        return ret;
     }
     return RT_EOK;
