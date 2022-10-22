@@ -12,13 +12,13 @@
 
 ##### 1、背景介绍：
 
-#### [§<u>02</u> RT-thread](https://www.rt-thread.org)
+#### [§<u>02</u> RT-thread]([https://www.rt-thread.org](https://www.rt-thread.org/))
 
 ##### 2.2.1 嵌入式实时操作系统
 
 嵌入式实时操作系统（Embedded Real-time Operation System，一般称作RTOS），是指当外界事件或数据产生时，能够接受并以足够快的速度予以处理，其处理的结果又能在规定的时间之内来控制生产过程或对处理系统作出快速响应，并控制所有实时任务协调一致运行的嵌入式操作系统 。其主要特点是提供及时响应和高可靠性，核心是任务调度，任务调度的核心是调度算法。主流的RTOS国外的有μClinux、μC/OS-II、eCos、FreeRTOS等，国内的有RT-Thread、Huawei LiteOS等。
 
-##### [2.3.2 RT-Thread 概述]((https://www.rt-thread.org/document/site/#/rt-thread-version/rt-thread-standard/README))
+##### [2.3.2 RT-Thread 概述]([RT-Thread 简介](https://www.rt-thread.org/document/site/#/rt-thread-version/rt-thread-standard/README))
 
 RT-Thread，全称是 Real Time-Thread，是一款我国具有完全自主知识产权的开源嵌入式实时多线程操作系统，3.1.0 以后的版本遵循 Apache License 2.0 开源许可协议。它的基本属性之一是支持多任务，事实上，多个任务同时执行只是一种错觉，一个处理器核心在某一时刻只能运行一个任务。由于每次对一个任务的执行时间很短、任务与任务之间通过任务调度器进行非常快速地切换（调度器根据优先级决定此刻该执行的任务），就造成了这样一种错觉。在 RT-Thread 系统中，任务是通过线程实现的，RT-Thread 中的线程调度器也就是以上提到的任务调度器。经过了15年的迭代和丰富，伴随着物联网的兴起，现已经成为市面上装机量最大（超6亿台）、开发者数量最多、软硬件生态最好的物联网操作系统之一。
 
@@ -63,21 +63,21 @@ STM32系列单片机为32位单片机，功能更强大，同时配置过程更�
 
 电路得名于“H桥式驱动电路”是因为它的形状酷似字母H。4个三极管组成H的4条垂直腿，而电机就是H中的横杠（注意：图1及随后的两个图都只是示意图，而不是完整的电路图，其中三极管的驱动电路没有画出来）。如图所示，H桥式电机驱动电路包括4个三极管和一个电机。要使电机运转，必须导通对角线上的一对三极管。根据不同三极管对的导通情况，电流可能会从左至右或从右至左流过电机，从而控制电机的转向。
 
-![2022-10-16-21-10-33-image](D:\stm32\car\rt_car\README.assets\2022-10-16-21-10-33-image.png)
+![H桥1](D:\SRP\SRP\assets\H桥1.png)
 
 要使电机运转，必须使对角线上的一对三极管导通。例如，如图2所示，当Q1管和Q4管导通时，电流就从电源正极经Q1从左至右穿过电机，然后再经Q4回到电源负极。按图中电流箭头所示，该流向的电流将驱动电机顺时针转动。当三极管Q1和Q4导通时，电流将从左至右流过电机，从而驱动电机按特定方向转动（电机周围的箭头指示为顺时针方向）。
 
-<img src="file:///C:/Users/Administrator/AppData/Roaming/marktext/images/2022-10-16-21-10-57-image.png" title="" alt="" data-align="center">
+![H桥2](D:\SRP\SRP\assets\H桥2.png)
 
 由图所示为另一对三极管Q2和Q3导通的情况，电流将从右至左流过电机。当三极管Q2和Q3导通时，电流将从右至左流过电机，从而驱动电机沿另一方向转动（电机周围的箭头表示为逆时针方向）。
 
-<img src="file:///C:/Users/Administrator/AppData/Roaming/marktext/images/2022-10-16-21-10-57-image.png" title="" alt="" data-align="center">
+![H桥3](D:\SRP\SRP\assets\H桥3.png)
 
 ###### 3.2.2 驱动器
 
 L298N，是一款接受高电压的电机驱动器，直流电机和步进电机都可以驱动。一片驱动芯片可同时控制两个直流减速电机做不同动作，在6V到46V的电压范围内，提供2安培的电流，并且具有过热自断和反馈检测功能。L298N可对电机进行直接控制，通过主控芯片的I/O输入对其控制电平进行设定，就可为电机进行正转反转驱动，操作简单、稳定性好，可以满足直流电机的大电流驱动条件。
 
-<img src="file:///D:/笔记/课设/单片机课设/L298N.jpg" title="" alt="" data-align="center">
+![L298N](D:\SRP\SRP\assets\L298N.jpg)
 
 ##### 3.3 编码器电机
 
@@ -85,13 +85,13 @@ L298N，是一款接受高电压的电机驱动器，直流电机和步进电机
 
 要想实现PID速度控制，必须对电机进行测速，这里采用自带测速装置的电机，编码器为霍尔编码器，具体如下图。
 
-<img title="" src="file:///D:/笔记/课设/单片机课设/电机.png" alt="" data-align="center">
+![电机](D:\SRP\SRP\assets\电机.png)
 
 ###### 3.3.2 测速原理及方法如下
 
 霍尔编码器是有霍尔马盘和霍尔元件组成。霍尔马盘是在一定直径的圆板上等分的布置有不同的磁极。霍尔马盘与电动机同轴，电动机旋转时，霍尔元件检测输出若干脉冲信号，为判断转向，一般输出两组存在一定相位差的方波信号。示意图如下：
 
-<img title="" src="file:///C:/Users/Administrator/AppData/Roaming/marktext/images/2022-10-16-21-26-03-image.png" alt="" data-align="center">
+![编码器](D:\SRP\SRP\assets\编码器.png)
 
 通常有两种方式，第一种软件技术直接采用外部中断进行采集，根据AB相位差的不同可以判断正负。第二种硬件技术直接使用定时器的编码器模式，这里采用第二种。也是常说的四倍频，提高测量精度的方法。其实就是把AB相的上升沿和下降沿都采集而已，所以是四倍频。
 
@@ -99,15 +99,15 @@ L298N，是一款接受高电压的电机驱动器，直流电机和步进电机
 
 ##### 4.1 PID算法
 
-<img src="file:///C:/Users/Administrator/AppData/Roaming/marktext/images/2022-10-16-21-38-37-image.png" title="" alt="" data-align="center">
+![PID](D:\SRP\SRP\assets\PID.png)
 
 ###### 4.1.1 位置式PID
 
-<img title="" src="file:///C:/Users/Administrator/AppData/Roaming/marktext/images/2022-10-16-21-39-03-image.png" alt="" data-align="center">
+![位置式PID](D:\SRP\SRP\assets\位置式PID.png)
 
 ###### 4.1.2 增量式PID
 
-<img src="file:///C:/Users/Administrator/AppData/Roaming/marktext/images/2022-10-16-21-39-25-image.png" title="" alt="" data-align="center">
+![增量式PID](D:\SRP\SRP\assets\增量式PID.png)
 
 ##### 4.2 基本编程实现
 
@@ -154,7 +154,7 @@ void PID_Compute(struct PID* pid)
 
 STM32CubeMX是一种图形工具，通过分步过程可以非常轻松地配置STM32微控制器和微处理器，以及为Arm® Cortex®-M内核或面向Arm® Cortex®-A内核的特定Linux®设备树生成相应的初始化C代码。
 
-![image-20221022192447731](D:\SRP\SRP\assets\image-20221022192447731.png)
+![image-20221022193237215](D:\SRP\SRP\assets\image-20221022193237215.png)
 
 ##### [5.2 RT-Thread Studio](https://www.rt-thread.org/studio.html)
 
@@ -174,6 +174,8 @@ RT-Thread Studio 主要包括工程创建和管理，代码编辑，SDK管理，
 
 ###### 5.3.2 关联RT_Thread Studio与STM32CubeMX
 
-右键CubeMX Settings，更新STM32CubeMX路径。
+右键STM32CubeMX Settings，更新STM32CubeMX路径。
 
 ![image-20221022192624899](D:\SRP\SRP\assets\image-20221022192624899.png)
+
+选择STM32CubeMX可执行文件的安装路径。
