@@ -154,7 +154,7 @@ void PID_Compute(struct PID* pid)
 
 STM32CubeMX是一种图形工具，通过分步过程可以非常轻松地配置STM32微控制器和微处理器，以及为Arm® Cortex®-M内核或面向Arm® Cortex®-A内核的特定Linux®设备树生成相应的初始化C代码。
 
-![image-20221017181208154](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20221017181208154.png)
+![image-20221022192447731](D:\SRP\SRP\assets\image-20221022192447731.png)
 
 ##### [5.2 RT-Thread Studio](https://www.rt-thread.org/studio.html)
 
@@ -162,7 +162,7 @@ STM32CubeMX是一种图形工具，通过分步过程可以非常轻松地配置
 
 RT-Thread Studio 主要包括工程创建和管理，代码编辑，SDK管理，RT-Thread配置，构建配置，调试配置，程序下载和调试等功能，结合图形化配置系统以及软件包和组件资源，减少重复工作，提高开发效率。
 
-![image-20221017180951290](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20221017180951290.png)
+![image-20221022191426278](D:\SRP\SRP\assets\image-20221022191426278.png)
 
 ##### 5.3 开发环境搭建 
 
@@ -170,14 +170,10 @@ RT-Thread Studio 主要包括工程创建和管理，代码编辑，SDK管理，
 
 ###### 5.3.1 创建RT-Thread项目
 
-![image-20221017193713638](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20221017193713638.png)
+![image-20221022192551411](D:\SRP\SRP\assets\image-20221022192551411.png)
 
 ###### 5.3.2 关联RT_Thread Studio与STM32CubeMX
 
 右键CubeMX Settings，更新STM32CubeMX路径。
 
-![image-20221017193019438](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20221017193019438.png)
-
-选择STM32CubeMX安装文件夹中的可执行文件。
-
-![image-20221017194440900](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20221017194440900.png)
+![image-20221022192624899](D:\SRP\SRP\assets\image-20221022192624899.png)
