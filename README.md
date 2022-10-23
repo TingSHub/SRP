@@ -178,15 +178,58 @@ RT-Thread Studio 主要包括工程创建和管理，代码编辑，SDK管理，
 
 ![image-20221022192624899.png](https://github.com/TingSHub/SRP/blob/master/assets/image-20221022192624899.png?raw=true)
 
-#### §<u>06</u> OLED屏幕显示
+#### §<u>06</u> FinSH
 
-##### 6.1 [u8g2](https://github.com/olikraus/u8g2)软件包移植
+##### 6.1 FinSH 
 
-###### 6.1.1 U8g2 是用于嵌入式设备的单色图形库
+FinSH 是 RT-Thread 的命令行组件，提供一套供用户在命令行调用的操作接口，主要用于调试或查看系统信息。它可以使用串口 / 以太网 / USB 等与 PC 机进行通信。
+用户在控制终端输入命令，控制终端通过串口、USB、网络等方式将命令传给设备里的 FinSH，FinSH 会读取设备输入命令，解析并自动扫描内部函数表，寻找对应函数名，执行函数后输出回应，回应通过原路返回，将结果显示在控制终端上。当使用串口连接设备与控制终端时，FinSH 命令的执行流程，如下图所示：
+
+##### 6.2 FinSH初探
+
+通过FinSH，我们可以很方便地进行程序的调试以及动态查看RT-Thread运行情况，通过help命令查看FinSH中支持的命令，也可以通过list_thread命令查看操作系统中运行的进程。
+
+##### 6.2 导出命令到FinSH
+
+FinSH不仅支持本身自带命令，也支持自定义的命令，以下代码便是自定义查看系统时钟频率的命令导出函数：
+
+```c
+void clock_show(void)
+{
+    rt_kprintf("System Clock information\n");
+    rt_kprintf("SYSCLK_Frequency = %d\n", HAL_RCC_GetSysClockFreq()); //168M
+    rt_kprintf("HCLK_Frequency   = %d\n", HAL_RCC_GetHCLKFreq());     //168M
+    rt_kprintf("PCLK1_Frequency  = %d\n", HAL_RCC_GetPCLK1Freq());    //42M
+    rt_kprintf("PCLK2_Frequency  = %d\n", HAL_RCC_GetPCLK2Freq());    //84M
+}
+MSH_CMD_EXPORT(clock_show, show system clock.);
+```
+
+测试如下：
+
+
+
+#### §<u>07</u> 串口
+
+#### §<u>08</u> 电机
+
+#### §<u>09</u> 编码器
+
+#### §<u>10</u> 舵机
+
+#### §<u>11</u> OLED
+
+#### §<u>12</u> OLED
+
+##### 12.1 [u8g2](https://github.com/olikraus/u8g2)软件包移植
+
+###### 12.1.1 U8g2 是用于嵌入式设备的单色图形库
 
 支持显示控制器：SSD1305、SSD1306、SSD1309、SSD1316、SSD1322、SSD1325、SSD1327、SSD1329、SSD1606、 SSD1607、 SH1106、SH1107、SH1108、SH1122、T6963、RA8835、LC7981、PCD8544、PCF8812、HX1230、UC1601、UC1604、UC1608、UC1610、 UC1611， UC1617， UC1701， ST7511， ST7528， ST7565， ST7567， ST7571， ST7586， ST7588， ST75256， ST75320， NT7 534， ST7920， IST3020， IST7920， LD7032， KS0108， KS0713， SED1520， SBN1661， IL3820， MAX7219 等。
 
-###### 6.1.2 U8g2 还包括 U8x8 库。U8g2 和 U8x8 的功能包括
+###### 12.1.2 U8g2 还包括 U8x8 库
+
+**U8g2 和 U8x8 的功能包括**
 
 **U8g2：**
 
@@ -202,4 +245,24 @@ RT-Thread Studio 主要包括工程创建和管理，代码编辑，SDK管理，
 - U8g2图形库使用技巧（硬件驱动接口部分的分析和选择）：
 
 U8g2图形库的驱动接口主要取决于所选用的lcd屏幕的驱动芯片方案，目前常用的驱动接口多为spi和i2c两种串行总线，如果需要较高的刷新帧率，spi的驱动方式是比较好的选择，spi的驱动时钟频率一般可以达到8Mbit，而i2c的方式一般只能达到400Kbit，但是使用spi方式驱动的时候，需要比较多的io管脚资源，一般最少需要3个io（三线spi方式），而i2c方式一般只需要2个io就可以满足。这里OLED用来显示速度等信息，对传输速率要求不高，采用IIC方式进行通信。
+
+##### 12.2 RT-Thread移植u8g2软件包
+
+###### 12.2.1 将u8g2软件包加入项目
+
+在软件包页面搜索u8g2软件包，选择使用硬件IIC，版本选择C-lastest。
+
+###### 12.2.2 使用STM32硬件IIC
+
+在board.h文件中添加如下代码。
+
+```c
+#define BSP_USING_I2C1
+#ifdef BSP_USING_I2C1
+#define BSP_I2C1_SCL_PIN    GET_PIN(B, 6)
+#define BSP_I2C1_SDA_PIN    GET_PIN(B, 7)
+#endif
+```
+
+同时硬件上连接好对应的SDA和SCL，测试如下。
 
