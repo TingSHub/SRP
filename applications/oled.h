@@ -12,6 +12,6 @@
 #include <u8g2_port.h>
 
 u8g2_t u8g2;
-void oled_init(void);
+int oled_init(void);
 
 #endif /* APPLICATIONS_OLED_H_ */

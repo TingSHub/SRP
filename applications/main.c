@@ -40,13 +40,16 @@ int main(void)
         return -RT_ERROR;
     }
     Motor_PID_Init();
-    //oled_init();
     if (timer_init()) {
         rt_kprintf("timer init error.\n");
         return -RT_ERROR;
     }
     if (buletooth_init()) {
         rt_kprintf("buletooth init error.\n");
+        return -RT_ERROR;
+    }
+    if (oled_init()) {
+        rt_kprintf("oled init error.\n");
         return -RT_ERROR;
     }
 

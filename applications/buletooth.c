@@ -106,13 +106,13 @@ int buletooth_init(void)
     //修改串口配置
     rt_device_control(buletooth, RT_DEVICE_CTRL_CONFIG, &config);
     /* 初始化信号量 */
-    rt_sem_init(&buletooth_rx_sem, "buletooth_rx_sem", 0, RT_IPC_FLAG_FIFO);
+    rt_sem_init(&buletooth_rx_sem, "buletooth", 0, RT_IPC_FLAG_FIFO);
     /* 以中断接收及轮询发送模式打开串口设备 */
     rt_device_open(buletooth, RT_DEVICE_FLAG_INT_RX);
     /* 设置接收回调函数 */
     rt_device_set_rx_indicate(buletooth, buletooth_input);
     /* 创建 蓝牙接收 线程 */
-    struct rt_thread *thread_buletooth = rt_thread_create("Buletooth-Thread", serial_thread_entry, RT_NULL, 1024, 25, 10);
+    struct rt_thread *thread_buletooth = rt_thread_create("buletooth", serial_thread_entry, RT_NULL, 1024, 25, 10);
     /* 创建成功则启动线程 */
     if (thread_buletooth != RT_NULL) {
         rt_thread_startup(thread_buletooth);
