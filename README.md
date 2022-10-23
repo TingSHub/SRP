@@ -185,9 +185,13 @@ RT-Thread Studio 主要包括工程创建和管理，代码编辑，SDK管理，
 FinSH 是 RT-Thread 的命令行组件，提供一套供用户在命令行调用的操作接口，主要用于调试或查看系统信息。它可以使用串口 / 以太网 / USB 等与 PC 机进行通信。
 用户在控制终端输入命令，控制终端通过串口、USB、网络等方式将命令传给设备里的 FinSH，FinSH 会读取设备输入命令，解析并自动扫描内部函数表，寻找对应函数名，执行函数后输出回应，回应通过原路返回，将结果显示在控制终端上。当使用串口连接设备与控制终端时，FinSH 命令的执行流程，如下图所示：
 
+![finsh.png](https://github.com/TingSHub/SRP/blob/master/assets/finsh.png?raw=true)
+
 ##### 6.2 FinSH初探
 
 通过FinSH，我们可以很方便地进行程序的调试以及动态查看RT-Thread运行情况，通过help命令查看FinSH中支持的命令，也可以通过list_thread命令查看操作系统中运行的进程。
+
+![FinSH初探.png](https://github.com/TingSHub/SRP/blob/master/assets/FinSH%E5%88%9D%E6%8E%A2.png?raw=true)
 
 ##### 6.2 导出命令到FinSH
 
@@ -207,7 +211,7 @@ MSH_CMD_EXPORT(clock_show, show system clock.);
 
 测试如下：
 
-
+![时钟频率测试.png](https://github.com/TingSHub/SRP/blob/master/assets/%E6%97%B6%E9%92%9F%E9%A2%91%E7%8E%87%E6%B5%8B%E8%AF%95.png?raw=true)
 
 #### §<u>07</u> 串口
 
@@ -215,9 +219,9 @@ MSH_CMD_EXPORT(clock_show, show system clock.);
 
 #### §<u>09</u> 编码器
 
-#### §<u>10</u> 舵机
+#### §<u>10</u> 速度控制
 
-#### §<u>11</u> OLED
+#### §<u>11</u> 舵机
 
 #### §<u>12</u> OLED
 
@@ -252,6 +256,8 @@ U8g2图形库的驱动接口主要取决于所选用的lcd屏幕的驱动芯片�
 
 在软件包页面搜索u8g2软件包，选择使用硬件IIC，版本选择C-lastest。
 
+![添加U8g2软件包.png](https://github.com/TingSHub/SRP/blob/master/assets/%E6%B7%BB%E5%8A%A0U8g2%E8%BD%AF%E4%BB%B6%E5%8C%85.png?raw=true)
+
 ###### 12.2.2 使用STM32硬件IIC
 
 在board.h文件中添加如下代码。
@@ -266,3 +272,4 @@ U8g2图形库的驱动接口主要取决于所选用的lcd屏幕的驱动芯片�
 
 同时硬件上连接好对应的SDA和SCL，测试如下。
 
+![OLED测试.jpg](https://github.com/TingSHub/SRP/blob/master/assets/OLED%E6%B5%8B%E8%AF%95.jpg?raw=true)
