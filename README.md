@@ -148,7 +148,7 @@ void PID_Compute(struct PID* pid)
 }
 ```
 
-#### §<u>54</u> 开发工具
+#### §<u>5</u> 开发工具
 
 ##### [5.1 STM32CubeMX](https://www.st.com/zh/development-tools/stm32cubemx.html)
 
@@ -174,8 +174,32 @@ RT-Thread Studio 主要包括工程创建和管理，代码编辑，SDK管理，
 
 ###### 5.3.2 关联RT_Thread Studio与STM32CubeMX
 
-右键STM32CubeMX Settings，更新STM32CubeMX路径。
+右键STM32CubeMX Settings，更新STM32CubeMX安装路径。
 
 ![image-20221022192624899](D:\SRP\SRP\assets\image-20221022192624899.png)
 
-选择STM32CubeMX可执行文件的安装路径。
+#### §<u>06</u> OLED屏幕显示
+
+##### 6.1 [u8g2](https://github.com/olikraus/u8g2)软件包移植
+
+###### 6.1.1 U8g2 是用于嵌入式设备的单色图形库
+
+支持显示控制器：SSD1305、SSD1306、SSD1309、SSD1316、SSD1322、SSD1325、SSD1327、SSD1329、SSD1606、 SSD1607、 SH1106、SH1107、SH1108、SH1122、T6963、RA8835、LC7981、PCD8544、PCF8812、HX1230、UC1601、UC1604、UC1608、UC1610、 UC1611， UC1617， UC1701， ST7511， ST7528， ST7565， ST7567， ST7571， ST7586， ST7588， ST75256， ST75320， NT7 534， ST7920， IST3020， IST7920， LD7032， KS0108， KS0713， SED1520， SBN1661， IL3820， MAX7219 等。
+
+###### 6.1.2 U8g2 还包括 U8x8 库。U8g2 和 U8x8 的功能包括
+
+**U8g2：**
+
+- 包括所有图形程序（线/框/圆画）。
+- 支持很丰富的字体库。
+- 需要微控制器中的一些内存来渲染显示屏（需要消耗较多的ram空间资源）。
+
+**U8x8：**
+
+- 仅文本输出（字符）设备。
+- 仅允许使用每个字符固定大小（8x8 像素）的字体。
+- 直接写到显示屏上，无需微控制器中的缓冲（需要消耗较少的ram空间资源）。
+- U8g2图形库使用技巧（硬件驱动接口部分的分析和选择）：
+
+U8g2图形库的驱动接口主要取决于所选用的lcd屏幕的驱动芯片方案，目前常用的驱动接口多为spi和i2c两种串行总线，如果需要较高的刷新帧率，spi的驱动方式是比较好的选择，spi的驱动时钟频率一般可以达到8Mbit，而i2c的方式一般只能达到400Kbit，但是使用spi方式驱动的时候，需要比较多的io管脚资源，一般最少需要3个io（三线spi方式），而i2c方式一般只需要2个io就可以满足。这里OLED用来显示速度等信息，对传输速率要求不高，采用IIC方式进行通信。
+

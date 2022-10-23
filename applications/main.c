@@ -40,7 +40,7 @@ int main(void)
         return -RT_ERROR;
     }
     Motor_PID_Init();
-    oled_init();
+    //oled_init();
     if (timer_init()) {
         rt_kprintf("timer init error.\n");
         return -RT_ERROR;

@@ -196,7 +196,6 @@
 
 #define U8G2_USE_HW_I2C
 #define U8G2_I2C_DEVICE_NAME "i2c1"
-#define U8G2_USING_HW_I2C_SSD1306
 #define PKG_USING_U8G2
 
 /* U8G2 Examples */
