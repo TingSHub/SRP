@@ -15,28 +15,33 @@ u8g2_t u8g2;
 
 static void oled_thread_entry(void *parameter)
 {
-    char tmp[2][3];
+    char tmp[4][4];
     while (1) {
-        //u8g2_ClearBuffer(&u8g2);
+        u8g2_ClearBuffer(&u8g2);
         rt_mutex_take(pid_mutex, RT_WAITING_FOREVER);
         itoa(left.setpoint, tmp[0], 10);
         itoa(left.input, tmp[1], 10);
+        itoa(right.setpoint, tmp[2], 10);
+        itoa(right.input, tmp[3], 10);
         rt_mutex_release(pid_mutex);
         u8g2_SetFont(&u8g2, u8g2_font_ncenB10_tr);
         //显示设定值
-        u8g2_DrawStr(&u8g2, 0, 16, "target:");
-        u8g2_DrawStr(&u8g2, 72, 16, tmp[0]);
+        u8g2_DrawStr(&u8g2, 0, 16, "L-Tar:");
+        u8g2_DrawStr(&u8g2, 64, 16, tmp[0]);
         u8g2_DrawStr(&u8g2, 100, 16, "r/m");
-//        //显示测量值
-//        u8g2_DrawStr(&u8g2, 0, 32, "measure:");
-//        u8g2_DrawStr(&u8g2, 72, 32, tmp[1]);
-//        u8g2_DrawStr(&u8g2, 100, 32, "r/m");
-//        //显示占空比
-//        u8g2_DrawStr(&u8g2, 0, 48, "duty:");
-//        u8g2_DrawStr(&u8g2, 0, 64, "battery:");
-//        u8g2_DrawStr(&u8g2, 100, 48, "%");
-//        u8g2_DrawStr(&u8g2, 100, 64, "V");
-        //u8g2_SendBuffer(&u8g2);
+        //显示测量值
+        u8g2_DrawStr(&u8g2, 0, 32, "L-Mea:");
+        u8g2_DrawStr(&u8g2, 64, 32, tmp[1]);
+        u8g2_DrawStr(&u8g2, 100, 32, "r/m");
+
+        u8g2_DrawStr(&u8g2, 0, 48, "R-Tar:");
+        u8g2_DrawStr(&u8g2, 64, 48, tmp[2]);
+        u8g2_DrawStr(&u8g2, 100, 48, "r/m");
+
+        u8g2_DrawStr(&u8g2, 0, 64, "R-Mea:");
+        u8g2_DrawStr(&u8g2, 64, 64, tmp[3]);
+        u8g2_DrawStr(&u8g2, 100, 64, "r/m");
+        u8g2_SendBuffer(&u8g2);
         rt_thread_mdelay(1000);
     }
 }
