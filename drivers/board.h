@@ -173,9 +173,11 @@ extern "C"
 /*#define BSP_USING_PWM3*/
 //#define BSP_USING_PWM5
 #define BSP_USING_PWM2
+#define BSP_USING_PWM5
 #define BSP_USING_PWM2_CH2
 #define BSP_USING_PWM2_CH3
 #define BSP_USING_PWM2_CH4
+#define BSP_USING_PWM5_CH2
 #define BSP_USING_PULSE_ENCODER3
 #define BSP_USING_PULSE_ENCODER4
 /*-------------------------- PWM CONFIG END --------------------------*/

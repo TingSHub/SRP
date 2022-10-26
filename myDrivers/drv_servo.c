@@ -15,7 +15,7 @@
 
 #define SERVO_PWM_DEV "pwm2"
 #define SERVO_PWM_CHANNEL 4
-#define SERVO_PERIOD_PWM 20000000 //50HZ
+#define SERVO_PERIOD_PWM 10000000 //50HZ
 #define SERVO_NAME "servo"
 
 #define SET_SERVO_ANGLE 0x20 //舵机角度设置cmd

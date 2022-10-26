@@ -15,7 +15,7 @@ u8g2_t u8g2;
 
 static void oled_thread_entry(void *parameter)
 {
-    char tmp[4][4];
+    char tmp[4][8];
     while (1) {
         u8g2_ClearBuffer(&u8g2);
         rt_mutex_take(pid_mutex, RT_WAITING_FOREVER);
