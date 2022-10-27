@@ -217,6 +217,8 @@ MSH_CMD_EXPORT(clock_show, show system clock.);
 
 ##### 7.1 CubeMX配置串口2引脚
 
+![7.1.1.png](https://github.com/TingSHub/SRP/blob/master/assets/7.1.1.png?raw=true)
+
 ##### 7.2 修改board.h
 
 在board.h文件中添加如下代码：
@@ -232,6 +234,8 @@ MSH_CMD_EXPORT(clock_show, show system clock.);
 ##### 7.3 串口转蓝牙模块
 
 此模块可直接接入单片机的接收和发送引脚，搭建起蓝牙设备与单片机之间的桥梁，默认波特率为9600，也可以通过发送指令进行修改。
+
+![7.3.jpg](https://github.com/TingSHub/SRP/blob/master/assets/7.3.jpg?raw=true)
 
 ##### 7.4 应用层实现
 
