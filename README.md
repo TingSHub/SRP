@@ -6,11 +6,13 @@
 
 **参与组员：杨照璇、蒋云龙、高观文、黄厅**
 
-**仓库地址：[TingSHub (TingHuang) (github.com)]([TingSHub/SRP: A project of rt-thread. (github.com)](https://github.com/TingSHub/SRP))**
+**仓库地址：[TingSHub/SRP: A project of rt-thread. (github.com)](https://github.com/TingSHub/SRP)**
 
 #### §<u>01</u> 引言
 
-##### 1、背景介绍：
+##### 1、背景介绍
+
+为了提高学生的创新实践能力，学校组织开展SRP项目，本项目采用STMF407平台，结合RT-Thread实时操作系统，实现调速小车的遥控以及电机的PID调速等，极大地锻炼了学生的创新实践能力，对运动控制课程的改革具有很好的借鉴意义。
 
 #### [§<u>02</u> RT-thread]([https://www.rt-thread.org](https://www.rt-thread.org/))
 
