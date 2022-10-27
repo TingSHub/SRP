@@ -215,6 +215,112 @@ MSH_CMD_EXPORT(clock_show, show system clock.);
 
 #### §<u>07</u> 串口
 
+##### 7.1 CubeMX配置串口2引脚
+
+##### 7.2 修改board.h
+
+在board.h文件中添加如下代码：
+
+```c
+#define BSP_USING_UART2
+#define BSP_UART2_TX_PIN       "PD5"
+#define BSP_UART2_RX_PIN       "PD6"
+```
+
+这样便将串口配置完毕，宏定义的作用就是让操作系统自动将串口设备添加进操作系统内核中。
+
+##### 7.3 串口转蓝牙模块
+
+此模块可直接接入单片机的接收和发送引脚，搭建起蓝牙设备与单片机之间的桥梁，默认波特率为9600，也可以通过发送指令进行修改。
+
+##### 7.4 应用层实现
+
+在应用层，对于硬件设备的操作统一使用`rt_device_find()`函数实现
+
+```c
+/**
+ * This function finds a device driver by specified name.
+ *
+ * @param name the device driver's name
+ *
+ * @return the registered device driver on successful, or RT_NULL on failure.
+ */
+rt_device_t rt_device_find(const char *name)
+{
+    return (rt_device_t)rt_object_find(name, RT_Object_Class_Device);
+}
+RTM_EXPORT(rt_device_find);
+```
+
+此函数参数为设备的名字，通过查找操作系统中的设备，拿到设备句柄，并对设备进行操作。操作方法与Linux极为相似，首先调用`rt_device_open()`函数打开设备文件，如果是第一次打开设备，则调用`device_init()`函数进行初始化，接着对这个设备进行读写或者`control`操作。
+
+```c
+//蓝牙设备初始化函数
+int buletooth_init(void)
+{
+    rt_err_t ret = RT_EOK;
+
+    struct serial_configure config = RT_SERIAL_CONFIG_DEFAULT;  //初始化配置参数
+    config.baud_rate = BAUD_RATE_9600;                          //修改波特率为 9600
+
+    /* 查找系统中的串口设备 */
+    buletooth = rt_device_find(BULETOOTH_UART_NAME);
+    if (!buletooth) {
+        rt_kprintf("find %s failed!\n", BULETOOTH_UART_NAME);
+        return RT_ERROR;
+    }
+    //修改串口配置
+    rt_device_control(buletooth, RT_DEVICE_CTRL_CONFIG, &config);
+    /* 初始化信号量 */
+    rt_sem_init(&buletooth_rx_sem, "buletooth", 0, RT_IPC_FLAG_FIFO);
+    /* 以中断接收及轮询发送模式打开串口设备 */
+    rt_device_open(buletooth, RT_DEVICE_FLAG_INT_RX);
+    /* 设置接收回调函数 */
+    rt_device_set_rx_indicate(buletooth, buletooth_input);
+    /* 创建 蓝牙接收 线程 */
+    struct rt_thread *thread_buletooth = rt_thread_create("buletooth", 				                                                  serial_thread_entry, RT_NULL, 1024, 25, 10);
+    /* 创建成功则启动线程 */
+    if (thread_buletooth != RT_NULL) {
+        rt_thread_startup(thread_buletooth);
+    } else {
+        ret = RT_ERROR;
+    }
+
+    return ret;
+}
+```
+
+采用中断方式实现串口接收，当串口接收到数据时，释放信号量，进行小车速度及方向的控制。
+
+```c
+/* 接收数据回调函数 */
+static rt_err_t buletooth_input(rt_device_t dev, rt_size_t size)
+{
+    /* 串口接收到数据后产生中断 调用此回调函数 然后发送接收信号量 */
+    rt_sem_release(&buletooth_rx_sem);
+
+    return RT_EOK;
+}
+static void serial_thread_entry(void *parameter)
+{
+    static char ch = '\0';
+    while (1) {
+        char tmp = ch;
+        /* 从串口读取一个字节的数据 没有读取到则等待接收信号量 */
+        while (rt_device_read(buletooth, -1, &ch, 1) != 1) {
+            /* 阻塞等待接收信号量 等到信号量后再次读取数据 */
+            rt_sem_take(&buletooth_rx_sem, RT_WAITING_FOREVER);
+        }
+        if (tmp != ch || ch == 'X' || ch == 'Y') {
+            rt_mutex_take(pid_mutex, RT_WAITING_FOREVER);
+            RemoteControl(ch); //根据蓝牙发送字符进行动作
+            rt_mutex_release(pid_mutex);
+            rt_kprintf("%c\n", ch);
+        }
+    }
+}
+```
+
 #### §<u>08</u> 电机
 
 #### §<u>09</u> 编码器
