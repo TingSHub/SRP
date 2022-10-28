@@ -14,17 +14,17 @@
 
 为了提高学生的创新实践能力，学校组织开展SRP项目，本项目采用STMF407平台，结合RT-Thread实时操作系统，实现调速小车的遥控以及电机的PID调速等，极大地锻炼了学生的创新实践能力，对运动控制课程的改革具有很好的借鉴意义。
 
-#### [§<u>02</u> RT-thread]([https://www.rt-thread.org](https://www.rt-thread.org/))
+#### §<u>02</u> RT-thread
 
-##### 2.2.1 嵌入式实时操作系统
+##### 2.1 嵌入式实时操作系统
 
 嵌入式实时操作系统（Embedded Real-time Operation System，一般称作RTOS），是指当外界事件或数据产生时，能够接受并以足够快的速度予以处理，其处理的结果又能在规定的时间之内来控制生产过程或对处理系统作出快速响应，并控制所有实时任务协调一致运行的嵌入式操作系统 。其主要特点是提供及时响应和高可靠性，核心是任务调度，任务调度的核心是调度算法。主流的RTOS国外的有μClinux、μC/OS-II、eCos、FreeRTOS等，国内的有RT-Thread、Huawei LiteOS等。
 
-##### [2.3.2 RT-Thread 概述]([RT-Thread 简介](https://www.rt-thread.org/document/site/#/rt-thread-version/rt-thread-standard/README))
+##### 2.2 [RT-Thread 概述](https://www.rt-thread.org/document/site/#/rt-thread-version/rt-thread-standard/README)
 
 RT-Thread，全称是 Real Time-Thread，是一款我国具有完全自主知识产权的开源嵌入式实时多线程操作系统，3.1.0 以后的版本遵循 Apache License 2.0 开源许可协议。它的基本属性之一是支持多任务，事实上，多个任务同时执行只是一种错觉，一个处理器核心在某一时刻只能运行一个任务。由于每次对一个任务的执行时间很短、任务与任务之间通过任务调度器进行非常快速地切换（调度器根据优先级决定此刻该执行的任务），就造成了这样一种错觉。在 RT-Thread 系统中，任务是通过线程实现的，RT-Thread 中的线程调度器也就是以上提到的任务调度器。经过了15年的迭代和丰富，伴随着物联网的兴起，现已经成为市面上装机量最大（超6亿台）、开发者数量最多、软硬件生态最好的物联网操作系统之一。
 
-##### 2.3.3 RT-Thread 架构
+##### 2.3 RT-Thread 架构
 
 RT-Thread主要采用C语言编写，容易理解，移植方便，同时具有良好的可剪裁性，其架构图如图1.3中所示。Nano 版本（极简内核）仅需要 3KB Flash、1.2KB RAM 内存资源，适用于资源受限的微控制器（MCU）系统。完整版可以实现直观快速的模块化裁剪，无缝地导入丰富的软件功能包，实现类似 Android 的图形界面及触摸滑动效果、智能语音交互效果等复杂功能，适用于资源丰富的物联网设备。相较于 Linux 操作系统，RT-Thread 体积小，成本低，功耗低、启动快速。除此以外 RT-Thread 还具有实时性高、占用资源小等特点，非常适用于各种资源受限（如成本、功耗限制等）的场合。
 
@@ -32,7 +32,7 @@ RT-Thread主要采用C语言编写，容易理解，移植方便，同时具有�
 
 其中RT-Thread 内核，是 RT-Thread 的核心部分，包括了多线程及其调度、信号量、邮箱、消息队列、内存管理、定时器等。
 
-##### 2.3.4 前后台系统
+##### 2.4 前后台系统
 
 在嵌入式编程发展的早期，是用裸机大while()+中断模式编程的。优点是上手容易，处理简单任务绰绰有余。而随着计算性能的提高，嵌入式编程的发展是从简单到复杂、从单任务到多任务，加上物联网的兴起，要处理的任务也是越来越复杂，这种模式渐渐显露出弊端。
 
@@ -41,7 +41,7 @@ RT-Thread主要采用C语言编写，容易理解，移植方便，同时具有�
 3. 超级循环可以与系统计时器(硬件计时器)轻松同步，但如果系统需要多种不同的周期时间，则会很难实现。
 4. 超过超级循环周期的耗时函数需要做拆分，增加软件开销，应用程序难以理解，超级循环使得应用程序变得非常复杂，因此难以扩展。
 
-##### 2.3.5 RT-Thread 优劣势
+##### 2.5 RT-Thread 优劣势
 
 1. 更灵活的任务处理和更好的实时性。线程数量不受限制，优先级最大256个。首先RT-Thread系统先天就有着处理复杂任务、多任务并发的属性。可以把不同的任务拆分成不同的线程，根据优先级让系统自动调度，更好地可以对多任务进行区别对待。如果优先级配置得当，不同任务之间相互的影响可以降到最低。显著的优势在于，delay()时会将线程挂起，把cpu使用权交出去，这时候cpu可以处理其他任务，显著提高cpu的使用率。
 
@@ -158,13 +158,13 @@ void PID_Compute(struct PID* pid)
 
 #### §<u>5</u> 开发工具
 
-##### [5.1 STM32CubeMX](https://www.st.com/zh/development-tools/stm32cubemx.html)
+##### 5.1 [STM32CubeMX](https://www.st.com/zh/development-tools/stm32cubemx.html)
 
 STM32CubeMX是一种图形工具，通过分步过程可以非常轻松地配置STM32微控制器和微处理器，以及为Arm® Cortex®-M内核或面向Arm® Cortex®-A内核的特定Linux®设备树生成相应的初始化C代码。
 
 ![image-20221022193237215.png](https://github.com/TingSHub/SRP/blob/master/assets/image-20221022193237215.png?raw=true)
 
-##### [5.2 RT-Thread Studio](https://www.rt-thread.org/studio.html)
+##### 5.2 [RT-Thread Studio](https://www.rt-thread.org/studio.html)
 
 一站式的 RT-Thread 开发工具，通过简单易用的图形化配置系统以及丰富的软件包和组件资源，让物联网开发变得简单和高效。
 
@@ -381,7 +381,7 @@ float get_motor_rotate_speed(struct rt_device *encoder)
 #define BSP_USING_PWM5_CH2
 ```
 
-##### 9.3 设置PWM频率
+##### 9.3 设置PWM频率及占空比
 
 ```c
 rt_err_t rt_pwm_set(struct rt_device_pwm *device, int channel, rt_uint32_t period, rt_uint32_t pulse)
@@ -537,6 +537,36 @@ int timer_init(void)
 ```
 
 #### §<u>11</u> 舵机
+
+舵机也采用PWM信号进行方向的调节，同样，驱动层实现servo的驱动，并将servo设备注册到系统中。
+
+```c
+int init_servo(void)
+{
+    int ret = -1;
+    servo_dev->name = SERVO_NAME;
+    memset(&servo_dev->parent, 0, sizeof(struct rt_device));
+
+#ifdef RT_USING_DEVICE_OPS
+    servo_dev->parent.ops = &servo_drv_ops;
+#else
+    servo_dev->parent.init = drv_servo_init;
+    servo_dev->parent.open = drv_servo_open;
+    servo_dev->parent.close = drv_servo_close;
+    servo_dev->parent.control = drv_servo_control;
+    servo_dev->parent.read  = RT_NULL;
+    servo_dev->parent.write = RT_NULL;
+#endif /* RT_USING_DEVICE_OPS */
+
+    servo_dev->parent.type = RT_Device_Class_Miscellaneous;
+    //设备注册
+    ret = rt_device_register(&servo_dev->parent, servo_dev->name, RT_DEVICE_FLAG_RDWR);
+    RT_ASSERT(ret == RT_EOK);
+    return RT_EOK;
+}
+INIT_BOARD_EXPORT(init_servo);
+
+```
 
 #### §<u>12</u> OLED
 
