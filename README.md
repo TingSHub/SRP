@@ -97,6 +97,12 @@ L298N，是一款接受高电压的电机驱动器，直流电机和步进电机
 
 通常有两种方式，第一种软件技术直接采用外部中断进行采集，根据AB相位差的不同可以判断正负。第二种硬件技术直接使用定时器的编码器模式，这里采用第二种。也是常说的四倍频，提高测量精度的方法。其实就是把AB相的上升沿和下降沿都采集而已，所以是四倍频。
 
+##### 3.4 串口转蓝牙模块
+
+此模块可直接接入单片机的接收和发送引脚，搭建起蓝牙设备与单片机之间的桥梁，默认波特率为9600，也可以通过发送指令进行修改。
+
+![7.3.jpg](https://github.com/TingSHub/SRP/blob/master/assets/7.3.jpg?raw=true)
+
 #### §<u>04</u> PID
 
 ##### 4.1 PID算法
@@ -233,13 +239,7 @@ MSH_CMD_EXPORT(clock_show, show system clock.);
 
 这样便将串口配置完毕，宏定义的作用就是让操作系统自动将串口设备添加进操作系统内核中。
 
-##### 7.3 串口转蓝牙模块
-
-此模块可直接接入单片机的接收和发送引脚，搭建起蓝牙设备与单片机之间的桥梁，默认波特率为9600，也可以通过发送指令进行修改。
-
-![7.3.jpg](https://github.com/TingSHub/SRP/blob/master/assets/7.3.jpg?raw=true)
-
-##### 7.4 应用层实现
+##### 7.3 应用层实现
 
 在应用层，对于硬件设备的操作统一使用`rt_device_find()`函数实现
 
@@ -327,11 +327,210 @@ static void serial_thread_entry(void *parameter)
 }
 ```
 
-#### §<u>08</u> 电机
+#### §<u>08</u> 编码器
 
-#### §<u>09</u> 编码器
+##### 8.1 CubeMX配置编码器
 
-#### §<u>10</u> 速度控制
+AB相编码器需要两个引脚，可以采用外部中断方式进行计数，也可以使用STM32定时器自带的编码器模式，更方便测速，只需要在CubeMX中配置引脚。
+
+##### 8.2 修改board.h
+
+在board.h文件中添加如下代码：
+
+```c
+#define BSP_USING_PULSE_ENCODER3
+#define BSP_USING_PULSE_ENCODER4
+```
+
+##### 8.3 获取编码器值
+
+```c
+float get_motor_rotate_speed(struct rt_device *encoder)
+{
+    rt_int32_t count;
+    float rotateSpeed;
+    rt_device_read(encoder, 0, &count, 1);
+    /* 清空脉冲编码器计数值 */
+    rt_device_control(encoder, PULSE_ENCODER_CMD_CLEAR_COUNT, RT_NULL);
+    //转速 = 单位时间内的计数值 / 总分辨率 * 时间系数 单位 r / min
+    rotateSpeed = 60*count*(float)(1000/PID_TIMER_PERIOD)/(float)TOTAL_RESOLUTION;
+    return rotateSpeed;
+}
+```
+
+#### §<u>09</u> PWM
+
+##### 9.1 CubeMX配置
+
+直流电机采用H桥电路进行控制，通过PWM信号调节电机速度，占空比决定电机速度大小，在CubeMX中配置定时器为PWM输出模式，
+
+##### 9.2 修改board.h
+
+在board.h文件中添加如下代码：
+
+```c
+#define BSP_USING_PWM2
+#define BSP_USING_PWM5
+#define BSP_USING_PWM2_CH2
+#define BSP_USING_PWM2_CH3
+#define BSP_USING_PWM2_CH4
+#define BSP_USING_PWM5_CH2
+```
+
+##### 9.3 设置PWM频率
+
+```c
+rt_err_t rt_pwm_set(struct rt_device_pwm *device, int channel, rt_uint32_t period, rt_uint32_t pulse)
+{
+    rt_err_t result = RT_EOK;
+    struct rt_pwm_configuration configuration = {0};
+
+    if (!device)
+    {
+        return -RT_EIO;
+    }
+
+    configuration.channel = channel;
+    configuration.period = period;
+    configuration.pulse = pulse;
+    result = rt_device_control(&device->parent, PWM_CMD_SET, &configuration);
+
+    return result;
+}
+```
+
+#### §<u>10</u> 电机调速
+
+##### 10.1 驱动与应用分离
+
+在串口一节介绍了应用层操作硬件设备的方法，通过`rt_device_find()`函数找到相应的设备进行操作，但前提是系统中存在此设备。通过修改board.h文件，内核代码自动将串口设备添加进系统中，这部分代码在drv_usart.c中的`rt_hw_usart_init()`中实现。电机由正负端口，PWM信号输出口组成，以此为基础组成motor设备：
+
+```c
+struct motor_dev
+{
+    struct rt_device parent;
+    struct rt_device_pwm* pwm_device;
+    rt_uint32_t period;
+    char channel;
+    unsigned char pin1;
+    unsigned char pin2;
+    char *name;
+    char *pwm_name;
+} __motor_dev_left, __motor_dev_right;
+```
+
+在初始化完成后，调用`rt_device_register()`函数进行设备的注册，便能在应用层进行硬件设备的操作。
+
+```c
+/**
+ * This function registers a device driver with specified name.
+ *
+ * @param dev the pointer of device driver structure
+ * @param name the device driver's name
+ * @param flags the capabilities flag of device
+ *
+ * @return the error code, RT_EOK on initialization successfully.
+ */
+rt_err_t rt_device_register(rt_device_t dev,
+                            const char *name,
+                            rt_uint16_t flags)
+{
+    if (dev == RT_NULL)
+        return -RT_ERROR;
+
+    if (rt_device_find(name) != RT_NULL)
+        return -RT_ERROR;
+
+    rt_object_init(&(dev->parent), RT_Object_Class_Device, name);
+    dev->flag = flags;
+    dev->ref_count = 0;
+    dev->open_flag = 0;
+
+#if defined(RT_USING_POSIX)
+    dev->fops = RT_NULL;
+    rt_wqueue_init(&(dev->wait_queue));
+#endif
+
+    return RT_EOK;
+}
+RTM_EXPORT(rt_device_register);
+```
+
+##### 10.2 应用层
+
+驱动层实现`drv_motor_control()`函数：
+
+```c
+static rt_err_t drv_motor_control(rt_device_t dev, int cmd, void *arg)
+{
+    int duty = *((int*)(arg));
+    struct motor_dev *motor_dev = rt_container_of(dev, struct motor_dev, parent);
+    if (duty < -1000) {
+        duty = -1000;
+    } else if (duty > 1000) {
+        duty = 1000;
+    } else {}
+    switch (cmd) {
+    case SET_MOTOR_SPEED:
+        //设置PWM信号
+        set_motor_rotate(motor_dev, duty);
+        break;
+    default:
+        break;
+    }
+    return RT_EOK;
+}
+```
+
+应用层创建定时器，每100ms调用一次定时器超时函数，超时函数中获取电机速度，并进行PID算法计算，接着调用`rt_device_control()`函数，`rt_device_control()`函数中调用驱动层`drv_motor_control()`函数，最终作用到硬件，调节电机速度。
+
+```c
+volatile int leftSpeed;
+volatile int rightSpeed;
+rt_mutex_t pid_mutex = RT_NULL;
+
+void motor_timeout(void* parameter)
+{
+    float leftRotate = get_motor_rotate_speed(left_encoder);
+    float rightRotate = get_motor_rotate_speed(right_encoder);
+    leftSpeed = leftRotate;
+    rightSpeed = rightRotate;
+    //更新反馈速度 PID计算
+    rt_mutex_take(pid_mutex, RT_WAITING_FOREVER); //获取互斥量 防止设定值在pid计算时发生改变
+    PID_Input_Renew(&left, leftRotate);
+    PID_Compute(&left);
+    PID_Input_Renew(&right, rightRotate);
+    PID_Compute(&right);
+    rt_mutex_release(pid_mutex);  //释放互斥量
+    int leftOuput = PID_Output(&left);
+    int rightOuput = PID_Output(&right);
+    //计算输出值不变不调用驱动程序
+    rt_device_control(motor_left, SET_MOTOR_SPEED, (void*)(&leftOuput));
+    rt_device_control(motor_right, SET_MOTOR_SPEED, (void*)(&rightOuput));
+}
+
+int timer_init(void)
+{
+    rt_err_t ret;
+    pid_mutex = rt_mutex_create("pid",RT_IPC_FLAG_PRIO);
+    if (pid_mutex == RT_NULL) {
+        rt_kprintf("pid_mutex create fail.\n");
+    }
+    //创建硬件定时器 周期计时 OSTick = 100hz 100ms计算一次
+    rt_timer_t motor_timer = rt_timer_create("motor", motor_timeout, NULL,
+            PID_TIMER_PERIOD, RT_TIMER_FLAG_PERIODIC | RT_TIMER_FLAG_SOFT_TIMER);
+    if (motor_timer == RT_NULL) {
+       rt_kprintf("motor timer error.\n");
+       return -RT_ERROR;
+    }
+    ret = rt_timer_start(motor_timer);
+    if (ret != RT_EOK) {
+       rt_kprintf("motor timer start error.\n");
+       return ret;
+    }
+    return ret;
+}
+```
 
 #### §<u>11</u> 舵机
 
