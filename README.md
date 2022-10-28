@@ -225,7 +225,7 @@ MSH_CMD_EXPORT(clock_show, show system clock.);
 
 ##### 7.1 CubeMX配置串口2引脚
 
-![7.1.1.png](https://github.com/TingSHub/SRP/blob/master/assets/7.1.1.png?raw=true)
+![7.1.png](https://github.com/TingSHub/SRP/blob/master/assets/7.1.png?raw=true)
 
 ##### 7.2 修改board.h
 
@@ -333,6 +333,8 @@ static void serial_thread_entry(void *parameter)
 
 AB相编码器需要两个引脚，可以采用外部中断方式进行计数，也可以使用STM32定时器自带的编码器模式，更方便测速，只需要在CubeMX中配置引脚。
 
+![8.1.png](https://github.com/TingSHub/SRP/blob/master/assets/8.1.png?raw=true)
+
 ##### 8.2 修改board.h
 
 在board.h文件中添加如下代码：
@@ -362,7 +364,9 @@ float get_motor_rotate_speed(struct rt_device *encoder)
 
 ##### 9.1 CubeMX配置
 
-直流电机采用H桥电路进行控制，通过PWM信号调节电机速度，占空比决定电机速度大小，在CubeMX中配置定时器为PWM输出模式，
+直流电机采用H桥电路进行控制，通过PWM信号调节电机速度，占空比决定电机速度大小，在CubeMX中配置定时器为PWM输出模式。
+
+![9.1.png](https://github.com/TingSHub/SRP/blob/master/assets/9.1.png?raw=true)
 
 ##### 9.2 修改board.h
 
