@@ -1,3 +1,5 @@
+[TOC]
+
 ### 基于rt-thread的遥控调速小车项目
 
 **学 校： 华南理工大学**
@@ -538,6 +540,8 @@ int timer_init(void)
 
 #### §<u>11</u> 舵机
 
+##### 11.1 舵机驱动
+
 舵机也采用PWM信号进行方向的调节，同样，驱动层实现servo的驱动，并将servo设备注册到系统中。
 
 ```c
@@ -567,6 +571,8 @@ int init_servo(void)
 INIT_BOARD_EXPORT(init_servo);
 
 ```
+
+##### 11.2 方向调节
 
 #### §<u>12</u> OLED
 
