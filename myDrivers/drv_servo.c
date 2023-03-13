@@ -14,8 +14,8 @@
 #include <string.h>
 
 #define SERVO_PWM_DEV "pwm2"
-#define SERVO_PWM_CHANNEL 4
-#define SERVO_PERIOD_PWM 10000000 //50HZ
+#define SERVO_PWM_CHANNEL 2
+#define SERVO_PERIOD_PWM 2000000 //50HZ
 #define SERVO_NAME "servo"
 
 #define SET_SERVO_ANGLE 0x20 //舵机角度设置cmd
@@ -53,7 +53,7 @@ static struct rt_device_ops servo_drv_ops =
 
 static void set_servo_angle(struct servo_dev *servo_dev, int duty)
 {
-    rt_uint32_t pulse = servo_dev->servo_pwm_drv.period / 1000 * duty;
+    rt_uint32_t pulse = servo_dev->servo_pwm_drv.period / 100 * duty;
     rt_pwm_set(servo_dev->servo_pwm_drv.pwm_device, servo_dev->servo_pwm_drv.channel, servo_dev->servo_pwm_drv.period, pulse);
 }
 

@@ -18,7 +18,7 @@
 #define MOTOR_PWM_DEV           "pwm2"
 #define MOTOR_LEFT_NAME         "motor-left"
 #define MOTOR_RIGHT_NAME        "motor-right"
-#define MOTOR_LEFT_PWM_CHANNEL  2
+#define MOTOR_LEFT_PWM_CHANNEL  4
 #define MOTOR_RIGHT_PWM_CHANNEL 3
 #define MOTOR_PERIOD_PWM        1000000
 

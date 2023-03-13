@@ -14,6 +14,7 @@
 #include "timer.h"
 #include "pid.h"
 #include "servo.h"
+#include "motor.h"
 
 void clock_show(void)
 {
@@ -31,6 +32,8 @@ void set_left_speed(int argc, char **argv)
         rt_kprintf("arguments error.\n");
     }
     PID_Change_Setpoint(&left, atoi(argv[1]));
+//    int speed = atoi(argv[1]);
+//    rt_device_control(motor_left, SET_MOTOR_SPEED, (void*)(&speed));
 }
 MSH_CMD_EXPORT(set_left_speed, set motor left speed control range from -1000 to 1000.);
 
@@ -40,6 +43,8 @@ void set_right_speed(int argc, char **argv)
         rt_kprintf("arguments error.\n");
     }
     PID_Change_Setpoint(&right, atoi(argv[1]));
+//    int speed = atoi(argv[1]);
+//    rt_device_control(motor_right, SET_MOTOR_SPEED, (void*)(&speed));
 }
 MSH_CMD_EXPORT(set_right_speed, set motor right speed control range from -1000 to 1000.);
 
